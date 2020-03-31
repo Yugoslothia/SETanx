@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tank test</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+  // set variables to reference for sprite placement
+  var width = 800
+  var height = 750
+
+    var config = {
+        type: Phaser.AUTO,
+        width: width,
+        height: height,
+		physics: {
+			default: 'arcade',
+			arcade: {
+				gravity: false,
+				debug: true
+			}
+		},
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+    function preload () {
+		this.load.image('tank', 'assets/Tank.png');
+		this.load.image('background', 'assets/floorbackground.png');
+		this.load.image('wall', 'assets/sandbags.png');
+		this.load.image('vertWall', 'assets/sandbagsvert.png');
+		this.load.image("bullet", 'assets/new_bullet.png');
+    this.load.image('borderwall', 'assets/wall.png');
+    this.load.image('borderwallvert', 'assets/wallvert.png');
+    this.load.image('enemy', 'assets/EnemyTankBody.png');
+    this.load.image('enemycannon', 'assets/EnemyTankHead.png');
+    }
+
+    function create () {
+      this.add.image(width/2,height/2, 'background').setScale();
+
+		walls = this.physics.add.staticGroup();
+    addBorder();
+		addWalls();
+
+    // all enemy cannons are offset +20 pixels from body
+		player = this.physics.add.sprite(width/4, height/6, 'tank');
+    enemy = this.physics.add.sprite(width*3/4, height*5/6, 'enemy').setScale(0.4);
+    enemy = this.physics.add.sprite(width*3/4+20, height*5/6, 'enemycannon').setScale(0.4);
+    enemy = this.physics.add.sprite(width/2, height/2, 'enemy').setScale(0.4);
+    enemy = this.physics.add.sprite(width/2+20, height/2, 'enemycannon').setScale(0.4);
+    enemy = this.physics.add.sprite(width*3/4, height/6, 'enemy').setScale(0.4);
+    enemy = this.physics.add.sprite(width*3/4+20, height/6, 'enemycannon').setScale(0.4);
+		player.setCollideWorldBounds(true);
+
+		this.physics.add.collider(player, walls);
+		cursor = this.input.keyboard.createCursorKeys();
+
+		bullets = this.physics.add.group({
+			defaultKey: 'bullet',
+			maxSize: 5
+		});
+		this.physics.add.collider(bullets, walls);
+		spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    }
+
+    function update () {
+		movePlayer();
+		shoot();
+    }
+
+
+	function addWalls() {
+    // walls are 240x40
+    // vertWalls are 40x240
+    walls.create(width/2, 80, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height-80, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/4, height/2, 'wall').setScale(0.3).refreshBody();
+    walls.create(width*3/4, height/2, 'wall').setScale(0.3).refreshBody();
+	}
+
+
+  function addBorder() {
+    // border is offset +/- 125 around edges, so it overlaps the screen by 10
+    walls.create(0, -125, 'borderwall').setScale().refreshBody();
+    walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
+    walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
+    walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
+  }
+
+
+	function shoot() {
+		var bullet;
+		if (bullets.countActive(true) < 5 && Phaser.Input.Keyboard.JustDown(spacebar)) {
+			bullet = this.bullets.create(player.x-10, player.y);
+			bullet.body.setVelocityY(Phaser.Math.Between(-200,200));
+			bullet.body.setVelocityX(-150);
+			bullet.body.setCollideWorldBounds(true).bounce.set(1);
+		}
+	}
+
+	function movePlayer() {
+		if(cursor.left.isDown) { player.setVelocityX(-100);}
+		else if (cursor.right.isDown) { player.setVelocityX(100);}
+		else if (cursor.down.isDown) { player.setVelocityY(100);}
+		else if (cursor.up.isDown) { player.setVelocityY(-100);}
+		else {
+			player.setVelocity(0);
+		}
+	}
+
+</script>
+
+</body>
+</html>
