@@ -38,15 +38,20 @@
 
     var game = new Phaser.Game(config);
     function preload () {
-		this.load.image('tank', 'assets/Tank.png');
-		this.load.image('background', 'assets/floorbackground.png');
-		this.load.image('wall', 'assets/sandbags.png');
-		this.load.image('vertWall', 'assets/sandbagsvert.png');
-		this.load.image("bullet", 'assets/new_bullet.png');
-    this.load.image('borderwall', 'assets/wall.png');
-    this.load.image('borderwallvert', 'assets/wallvert.png');
-    this.load.image('enemy', 'assets/EnemyTankBody.png');
-    this.load.image('enemycannon', 'assets/EnemyTankHead.png');
+		this.load.image('tank', '../assets/Tank.png');
+		this.load.image('background', '../assets/floorbackground.png');
+		this.load.image('wall', '../assets/sandbags.png');
+		this.load.image('vertWall', '../assets/sandbagsvert.png');
+		this.load.image("bullet", '../assets/new_bullet.png');
+    this.load.image('borderwall', '../assets/wall.png');
+    this.load.image('borderwallvert', '../assets/wallvert.png');
+    this.load.image('enemy', '../assets/EnemyTankBody.png');
+    this.load.image('enemycannon', '../assets/EnemyTankHead.png');
+    this.load.image('breakableWall', '../assets/razorWire.png');
+    this.load.image('speedBoost', '../assets/speedBoost.png');
+    this.load.image('shield', '../assets/shield.png');
+    this.load.image('minimize', '../assets/minimize.png');
+    this.load.image('slowEnemies', '../assets/slowEnemies.png');
     }
 
     function create () {

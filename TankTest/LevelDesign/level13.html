@@ -48,10 +48,12 @@
       this.load.image('enemy', '../assets/EnemyTankBody.png');
       this.load.image('enemycannon', '../assets/EnemyTankHead.png');
       this.load.image('breakableWall', '../assets/razorWire.png');
+      this.load.image('breakableWallVert', '../assets/razorWireVert.png');
       this.load.image('speedBoost', '../assets/speedBoost.png');
       this.load.image('shield', '../assets/shield.png');
       this.load.image('minimize', '../assets/minimize.png');
       this.load.image('slowEnemies', '../assets/slowEnemies.png');
+      this.load.image('breakableWallSquare', '../assets/razorWireSquare.png');
     }
 
     function create () {
@@ -62,11 +64,9 @@
 		addWalls();
 
     // all enemy cannons are offset +20 pixels from body
-		player = this.physics.add.sprite(width/4, height/4, 'tank');
-    enemy = this.physics.add.sprite(width*4/5, height*5/6, 'enemy').setScale(0.4);
-    enemy = this.physics.add.sprite(width*4/5+20, height*5/6, 'enemycannon').setScale(0.4);
-    enemy = this.physics.add.sprite(width/5, height*5/6, 'enemy').setScale(0.4);
-    enemy = this.physics.add.sprite(width/5+20, height*5/6, 'enemycannon').setScale(0.4);
+		player = this.physics.add.sprite(width/5, height/5, 'tank');
+    enemy = this.physics.add.sprite(width*3/4, height/2, 'enemy').setScale(0.4);
+    enemy = this.physics.add.sprite(width*3/4+20, height/2, 'enemycannon').setScale(0.4);
 		player.setCollideWorldBounds(true);
 
 		this.physics.add.collider(player, walls);
@@ -89,12 +89,23 @@
 	function addWalls() {
     // walls are 240x40
     // vertWalls are 40x240
-    walls.create(width-120, height*2/3, 'wall').setScale(0.4).refreshBody();
-    walls.create(120, height*2/3, 'wall').setScale(0.4).refreshBody();
-    walls.create(275, height*2/3, 'wall').setScale(0.4).refreshBody();
+    walls.create(width/2, 120, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height-120, 'vertWall').setScale(0.4).refreshBody();
 
+    //add breakable walls in squares through opening
+    walls.create(width/2, 255, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 295, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 335, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 375, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 415, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 455, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 495, 'breakableWallSquare').setScale(0.25).refreshBody();
 
 	}
+
+  function addBreakWalls() {
+    //walls.create(width/2, height/2, 'breakableWall').setScale(0.4).refreshBody();
+  }
 
 
   function addBorder() {
