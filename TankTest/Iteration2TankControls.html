@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tank test</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 1200,
+        height: 900,
+		physics: {
+			default: 'arcade',
+			arcade: {
+				gravity: false,
+				debug: false
+			}
+		},
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    function preload () {
+		this.load.image('tank', 'assets/playerTankBody.png');
+		this.load.image('tankHead', 'assets/playerTankHead.png');
+		this.load.image('background', 'assets/sky.png');
+		this.load.image('wall', 'assets/platform.png');
+		this.load.image('vertWall', 'assets/vertPlatform.png');
+		this.load.image('bullet', 'assets/new_bullet.png');
+		this.load.image('target', 'assets/crosshair.png');
+    }
+
+    function create () {
+		// Creating Walls
+		walls = this.physics.add.staticGroup();
+		addWalls();
+
+		// Setting up player properties
+		player = this.physics.add.sprite(400, 150, 'tank').setScale(0.6).setAngle(0);
+		player.setCollideWorldBounds(true);
+		this.physics.add.collider(player, walls);
+
+		// Seeting up playerHead properties
+		playerHead = this.physics.add.sprite(405, 148, 'tankHead').setScale(0.6);
+		playerHead.setOrigin(0.225,0.5);
+		playerHead.setCollideWorldBounds(true);
+		this.physics.add.collider(playerHead, walls);
+
+		//creating bullets Group
+		bullets = this.physics.add.group({
+			defaultKey: 'bullet',
+			maxSize: 5
+		});
+
+		this.physics.add.collider(bullets, walls);
+
+		//creating reticle
+		reticle = this.physics.add.sprite(500, 175, 'target');
+
+		// Creating input object with WASD Keys
+		moveKeys = this.input.keyboard.addKeys({
+			'up': Phaser.Input.Keyboard.KeyCodes.W,
+			'down': Phaser.Input.Keyboard.KeyCodes.S,
+			'left': Phaser.Input.Keyboard.KeyCodes.A,
+			'right': Phaser.Input.Keyboard.KeyCodes.D
+		});
+
+			// Enabling player movement with set keys
+		this.input.keyboard.on('keydown_W', function(event) {
+			player.setVelocityY(-125);
+			playerHead.setVelocityY(-125);
+		});
+		this.input.keyboard.on('keydown_S', function(event) {
+			player.setVelocityY(125);
+			playerHead.setVelocityY(125);
+		});
+		this.input.keyboard.on('keydown_A', function(event) {
+			player.setVelocityX(-125);
+			playerHead.setVelocityX(-125);
+		});
+		this.input.keyboard.on('keydown_D', function(event) {
+			player.setVelocityX(125);
+			playerHead.setVelocityX(125);
+		});
+
+		// Stops player movement on depress of set keys
+		this.input.keyboard.on('keyup_W', function(event) {
+			if (moveKeys['down'].isUp) {
+				player.setVelocityY(0);
+				playerHead.setVelocityY(0);
+			}
+		});
+		this.input.keyboard.on('keyup_S', function(event) {
+			if (moveKeys['up'].isUp) {
+				player.setVelocityY(0);
+				playerHead.setVelocityY(0);
+			}
+		});
+		this.input.keyboard.on('keyup_A', function(event) {
+			if (moveKeys['right'].isUp) {
+				player.setVelocityX(0);
+				playerHead.setVelocityX(0);
+			}
+		});
+		this.input.keyboard.on('keyup_D', function(event) {
+			if (moveKeys['left'].isUp) {
+				player.setVelocityX(0);
+				playerHead.setVelocityX(0);
+			}
+		});
+
+		//Lock pointer to game on mouseclick
+		game.canvas.addEventListener('mousedown', function() {
+			game.input.mouse.requestPointerLock();
+		});
+
+		// Moving reticle on mouse move
+		this.input.on('pointermove', function(pointer) {
+			if (this.input.mouse.locked) {
+				reticle.x += pointer.movementX;
+				reticle.y += pointer.movementY;
+			}
+		}, this);
+
+		// Firing bullet on left mouseclick
+		this.input.on('pointerdown', function(pointer) {
+			shoot(playerHead, reticle);
+		}, this);
+    }
+
+	function shoot(shooter, target) {
+		var bullet;
+		var direction;
+		if(bullets.countActive(true) < 5) {
+			bullet = this.bullets.create(shooter.x-30, shooter.y);
+			bullet.body.setCollideWorldBounds(true).bounce.set(1);
+			direction = Math.atan((target.x-bullet.x)/(target.y-bullet.x));
+			if(target.y >= bullet.y) {
+				bullet.setVelocityX(175*Math.sin(direction));
+				bullet.setVelocityY(175*Math.cos(direction));
+			}
+			else {
+				bullet.setVelocityX(-175*Math.sin(direction));
+				bullet.setVelocityY(-175*Math.cos(direction));
+			}
+
+		}
+	}
+
+    function update () {
+		playerHead.rotation = Phaser.Math.Angle.Between(playerHead.x, playerHead.y, reticle.x, reticle.y);
+
+		// Keeping playerHead locked to the main body
+		playerHead.x = player.x+5;
+		playerHead.y = player.y-2;
+    }
+	function addWalls() {
+		walls.create(400, 470, 'wall').setScale(0.7).refreshBody();
+		walls.create(561, 375, 'vertWall').setScale(0.7).refreshBody();
+		walls.create(50, 250, 'wall').setScale(0.7).refreshBody();
+		walls.create(750, 220, 'wall');
+	}
+
+</script>
+
+</body>
+</html>
