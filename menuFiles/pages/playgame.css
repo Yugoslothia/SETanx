@@ -1,0 +1,32 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-image: url(../floorbackground.png);
+}
+
+h2 {
+  color: green;
+  text-align: center;
+}
+
+ul {
+  padding-top: 20px;
+  text-align: center;
+}
+
+ul li {
+list-style: none;
+font-size: 35px;
+}
+
+ul li a {
+  color: blue;
+  text-decoration: none
+}
+
+ul li a:visited {
+  color: blue;
+}
