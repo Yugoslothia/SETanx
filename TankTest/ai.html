@@ -31,7 +31,6 @@
             update: update
         }
     };
-
     var game = new Phaser.Game(config);
     function preload () {
 		this.load.image('tank', 'assets/Tank.png');
@@ -48,7 +47,7 @@
   		walls = this.physics.add.staticGroup();
   		addWalls();
 
-  		player = this.physics.add.sprite(400, 150, 'tank');
+  		player = this.physics.add.sprite(400, 400, 'tank');
   		player.setCollideWorldBounds(true);
 
   		this.physics.add.collider(player, walls);
@@ -56,27 +55,29 @@
 
   		bullets = this.physics.add.group({
   			defaultKey: 'bullet',
-  			maxSize: 5
+  			maxSize: 4000
   		});
-  		this.physics.add.collider(bullets, walls);
+  		this.physics.add.collider(bullets, walls, wallBounce, null, this);
   		spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-      ai = this.physics.add.group({
-        key: 'enemy',
-        repeat: 2,
-        setXY: { x: 100, y: 40, stepX: 150}
-      });
+      ai = this.physics.add.sprite(100, 110, 'enemy');
+      ai.enableBody = true;
+      ai.body.setCollideWorldBounds(true);
       this.physics.add.collider(ai, player);
-      this.physics.add.collider(ai, ai);
+      this.physics.add.collider(ai, walls);
+      //this.physics.add.collider(ai, bullets, aiKill, null, this);
+      dead = false;
+    }
 
+      function update() {
+        movePlayer();
+    		shoot();
+        if(dead == false) {moveAI(); shootAI();}
       }
 
-      function update () {
-  		movePlayer();
-  		shoot();
-      //game.physics.arcade.collide(ai, bullets, collisionHandler, null, this);
-      moveAI();
-    }
+  function wallBounce(bullet, wall) {
+    bullet.disableBody(true, true);
+  }
 
 	function addWalls() {
 		walls.create(400, 470, 'wall').setScale(0.7).refreshBody();
@@ -87,9 +88,9 @@
 
 	function shoot() {
 		var bullet;
-		if (bullets.countActive(true) < 5 && Phaser.Input.Keyboard.JustDown(spacebar)) {
-			bullet = this.bullets.create(player.x-10, player.y);
-			bullet.body.setVelocityY(Phaser.Math.Between(-200,200));
+		if (bullets.countActive(true) < 20 && Phaser.Input.Keyboard.JustDown(spacebar)) {
+			bullet = this.bullets.create(player.x-10, player.y).setScale(0.3);
+			bullet.body.setVelocityY(Phaser.Math.Between(-150,150));
 			bullet.body.setVelocityX(-150);
 			bullet.body.setCollideWorldBounds(true).bounce.set(1);
 		}
@@ -104,17 +105,59 @@
 			player.setVelocity(0);
 		}
 	}
-/*
-  function collisionHandler(obj1, obj2){
-    obj1.kill();
-    obj2.kill();
-  }*/
 
+  function aiKill(ai, bullet) {
+    ai.disableBody(true, true);
+    bullet.disableBody(true, true);
+    dead = true;
+  }
+
+  // moves ai in proportionally across map
   function moveAI(){
-    //if(ai.physics.speed == 0) {ai.setVelocityX(100);}
-    if(ai.x < 500) {ai.setVelocityX(100);}
-    else if(ai.x > 500) {ai.setVelocityX(-100);}
+    if(ai.body.velocity.x == 0) {
+      ai.setVelocityX(100);
+      oldx = ai.x;
+      oldy = ai.y;
+    }
+    // randomly moves ai whenever it moves 100 pixels in y or x dir on dir change
+    if(ai.x - oldx > 100 || ai.x - oldx < -100 || ai.y - oldy > 100 || ai.y - oldy < -100
+        || (ai.x == oldx && ai.y == oldy)) {
+      dirx = Phaser.Math.Between(-1, 1);
+      diry = Phaser.Math.Between(-1, 1);
+      while(dirx == 0 && diry == 0) {
+          dirx = Phaser.Math.Between(-1, 1);
+          diry = Phaser.Math.Between(-1, 1);
+        }
+      if(Math.abs(dirx) == Math.abs(diry)) {
+        dirx *= Math.sqrt(2) / 2;
+        diry *= Math.sqrt(2) / 2;
+      }
+      ai.setVelocityX(100 * dirx);
+      ai.setVelocityY(100 * diry);
+      oldx = ai.x;
+      oldy = ai.y;
+    }
 
+  }
+  // failed attempt ot make ai shoot at player
+  function shootAI(){
+    var bullet;
+    if (bullets.countActive(true) < 3 && player.x - ai.x < 200
+        && player.y - ai.y < 200) {
+			bullet = this.bullets.create(ai.x-10, ai.y).setScale(0.3);
+      aimx = (ai.x - player.x);
+      aimy = (ai.y - player.y);
+      hyp = Math.sqrt((aimx * aimx) + (aimy * aimy));
+      if(aimy > 0)
+      {bullet.body.setVelocityY(150 * Math.asin(aimy / hyp));}
+      else
+      {bullet.body.setVelocityY(-150 * Math.asin(aimy / hyp));}
+      if(aimx > 0)
+      {bullet.body.setVelocityX(150 * Math.acos(aimx / hyp));}
+      else
+      {bullet.body.setVelocityX(-150 * Math.acos(aimx / hyp));}
+			bullet.body.setCollideWorldBounds(true).bounce.set(1);
+    }
   }
 
 </script>
