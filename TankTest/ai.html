@@ -39,6 +39,7 @@
 		this.load.image('vertWall', 'assets/vertPlatform.png');
 		this.load.image("bullet", 'assets/new_bullet.png');
     this.load.image("enemy", 'assets/EnemyTankBody.png');
+    this.load.image("enemyHead", 'assets/EnemyTankHead.png')
     }
 
     function create () {
@@ -67,12 +68,19 @@
       this.physics.add.collider(ai, walls);
       //this.physics.add.collider(ai, bullets, aiKill, null, this);
       dead = false;
+      aiHead = this.physics.add.sprite(100, 110, 'enemyHead');
+      aiHead.setOrigin(0.225, 0.5);
+
+      dirText = this.add.text(16, 16, '0', { fontSize: '32px', fill: '#000' });
     }
 
       function update() {
         movePlayer();
     		shoot();
-        if(dead == false) {moveAI(); shootAI();}
+        if(dead == false) {/*moveAI();*/ shootAI();}
+        aiHead.rotation = Phaser.Math.Angle.Between(aiHead.x, aiHead.y, player.x, player.y);
+        aiHead.x = ai.x;
+        aiHead.y = ai.y;
       }
 
   function wallBounce(bullet, wall) {
@@ -142,21 +150,22 @@
   // failed attempt ot make ai shoot at player
   function shootAI(){
     var bullet;
-    if (bullets.countActive(true) < 3 && player.x - ai.x < 200
-        && player.y - ai.y < 200) {
-			bullet = this.bullets.create(ai.x-10, ai.y).setScale(0.3);
-      aimx = (ai.x - player.x);
-      aimy = (ai.y - player.y);
-      hyp = Math.sqrt((aimx * aimx) + (aimy * aimy));
-      if(aimy > 0)
-      {bullet.body.setVelocityY(150 * Math.asin(aimy / hyp));}
-      else
-      {bullet.body.setVelocityY(-150 * Math.asin(aimy / hyp));}
-      if(aimx > 0)
-      {bullet.body.setVelocityX(150 * Math.acos(aimx / hyp));}
-      else
-      {bullet.body.setVelocityX(-150 * Math.acos(aimx / hyp));}
+    if(bullets.countActive(true) < 3 && player.x - ai.x < 400
+        && player.y - ai.y < 400) {
+			bullet = this.bullets.create(aiHead.x, aiHead.y).setScale(0.3);
+      direction = Math.atan((player.y-ai.y)/(player.x-ai.x));
+			bullet.setVelocityX(175 * Math.cos(direction));
+      bullet.setVelocityY(175 * Math.sin(direction));
+      if(player.x - ai.x < 0 && player.y - ai.y >= 0) {
+        bullet.setVelocityY(-175 * Math.sin(direction));
+        bullet.setVelocityX(-175 * Math.cos(direction));
+      }
+      if(player.x - ai.x < 0 && player.y - ai.y < 0) {
+        bullet.setVelocityY(-175 * Math.sin(direction));
+        bullet.setVelocityX(-175 * Math.cos(direction));
+      }
 			bullet.body.setCollideWorldBounds(true).bounce.set(1);
+      dirText.setText('Direction: ' + direction);
     }
   }
 
