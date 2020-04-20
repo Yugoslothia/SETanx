@@ -1,7 +1,12 @@
+// puts the tank head on the Ai
+// SHOULD ONLY BE CALLED BY THE AI CLASS AND SUBCLASSES.
 class AiHead extends Phaser.Physics.Arcade.Sprite {
+
   constructor(scene, x, y) {
     super(scene, x, y, 'enemyHead');
+    this.setOrigin(0.225, 0.5);
     scene.add.existing(this);
+    scene.physics.world.enable(this);
   }
 }
 
@@ -15,11 +20,15 @@ class Ai extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.collider(this, walls);
     this.aiHead = new AiHead(scene, this.x, this.y);
     this.dead = false;
+    scene.physics.add.collider(this, bullets, this.aiKill, null, this);
+
+    this.timedEvent = scene.time.addEvent({ delay: 2000, callback: this.shootAI, callbackScope: this, loop: true });
   }
 
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
-    if(this.dead == false) {this.moveAI(); this.shootAI();}
+    if(this.dead == false) {this.moveAI();}
+    this.aiHead.rotation = Phaser.Math.Angle.Between(this.aiHead.x, this.aiHead.y, player.x, player.y);
     this.aiHead.x = this.x;
     this.aiHead.y = this.y;
   }
@@ -51,14 +60,32 @@ class Ai extends Phaser.Physics.Arcade.Sprite {
   }
 
     shootAI(){
-      if(player.x - this.x < 400 && player.y - this.y < 400) {
-  			scene.add.existing(new Bullet(this.x, this.y));
+			var ebullet = enemyBullets.create(this.x, this.y);
+      var direction = Math.atan((player.y-this.y)/(player.x-this.x));
+      ebullet.setVelocityX(175 * Math.cos(direction));
+      ebullet.setVelocityY(175 * Math.sin(direction));
+      if(player.x - this.x < 0 && player.y - this.y >= 0) {
+        ebullet.setVelocityY(-175 * Math.sin(direction));
+        ebullet.setVelocityX(-175 * Math.cos(direction));
       }
+      if(player.x - this.x < 0 && player.y - this.y < 0) {
+        ebullet.setVelocityY(-175 * Math.sin(direction));
+        ebullet.setVelocityX(-175 * Math.cos(direction));
+      }
+      ebullet.body.setCollideWorldBounds(true);
+    }
+
+    aiKill(bullets) {
+      this.disableBody(true, true);
+      this.aiHead.disableBody(true, true);
+      bullets.disableBody(true, true);
+      this.timedEvent.remove();
+      this.dead = true;
     }
 
 
 }
-
+/*
 class Bullet extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "bullet");
@@ -78,4 +105,4 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(-175 * Math.cos(direction));
     }
   }
-}
+}*/
