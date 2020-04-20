@@ -32,7 +32,7 @@
             update: update
         }
     };
-
+    var gameOver = false;
     var game = new Phaser.Game(config);
 
     function preload () {
@@ -52,6 +52,7 @@
     this.load.image('enemyHead3', 'assets/EnemyTankHead3.png');
     this.load.image('enemy4', 'assets/EnemyTankBody4.png');
     this.load.image('enemyHead4', 'assets/EnemyTankHead4.png');
+    this.load.image('evilChris', 'assets/evilChris.png')
     }
 
     function create () {
@@ -83,12 +84,16 @@
     this.physics.add.collider(enemyBullets, walls, bulletKill, null, this);
     this.physics.add.collider(enemyBullets, player, playerKill, null, this);
 		this.physics.add.collider(bullets, walls);
-
-    new Ai(this, 200, 350);
-    aiStill = new AiStill(this, 200, 700);
-    //aiFastBullet = new aiFastBullet(this, 400, 400);
+    /*
+    ai = new Ai(this, 200, 350).setScale(0.4);
+    aiStill = new AiStill(this, 200, 700).setScale(0.4);
+    aiFastBullet = new AiFastBullet(this, 600, 900).setScale(0.4);
+    aiFastMoving = new AiFastMoving(this, 100, 50).setScale(0.4);
+    */
+    evilChris = new EvilChris(this, 900, 900).setScale(0.05);
 		//creating reticle
 		reticle = this.physics.add.sprite(500, 175, 'target').setScale(3.0);
+    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
 		// Creating input object with WASD Keys
 		moveKeys = this.input.keyboard.addKeys({
@@ -183,14 +188,15 @@
 		}
 	}
 
-    function update () {
+  function update () {
 		playerHead.rotation = Phaser.Math.Angle.Between(playerHead.x, playerHead.y, reticle.x, reticle.y);
-
 		// Keeping playerHead locked to the main body
 		playerHead.x = player.x+5;
 		playerHead.y = player.y-2;
-    //ai.update();
-    }
+    //if(ai.isDead() && aiStill.isDead() && aiFastBullet.isDead()) {this.physics.pause(); gameOver = true;}
+    if(evilChris.isDead()) {this.physics.pause(); gameOver = true;}
+    if(gameOver) {return ;}
+  }
 
   function bulletKill(enemyBullet, walls){
     enemyBullet.disableBody(true, true);
@@ -199,6 +205,9 @@
   function playerKill(enemyBullet, player){
     enemyBullet.disableBody(true, true);
     player.disableBody(true, true);
+    playerHead.disableBody(true, true);
+    this.physics.pause();
+    gameOver = true;
   }
 
 	function addWalls() {
