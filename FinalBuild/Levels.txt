@@ -1,0 +1,48 @@
+How to Change levels for Player and Ai class:
+
+1. Ensure that you have all textures that you need and make sure your AI and
+player classes are all updated
+
+2. Make a note of where the player and AI's spawn in the level and what types of
+AI are in the level itself (i.e. Ai, AiStill, EvilChris, etc.). If need be,
+check where they are spawned in and old build of the level if you mess up.
+
+3. Take the level1.html or any other already finished levelx.html and copy and
+paste the code from the function preload definitions to above (but not including)
+the addWalls() into the newlevel.html.
+
+4. Now, keeping everything where they are, spawn the appropriate amount of AI
+such that you follow the old level plan. You must keep the structure of how
+everything is set up, such that everything is spawned from top to bottom:
+- walls
+- bullets
+- enemyBullets
+- colliders for the bullets
+- player
+- ai's (ai can spawn in any order in dependence to other ai, but must be the
+last group to be spawned)
+Also, GIVE ALL AI'S UNIQUE NAMES AND CALL THEM LIKE enemy1 = new Ai(this, x, y).setScale(0.4);
+
+5. Now, go to the update() function and call every ai's isDead function that was
+spawned. Then, if we can, call the scene transition function. Otherwise, for now
+just pause that game with this.physics.pause()
+
+6. Lastly, make sure the ai.js?v=2 and player.js?v=2 are called above the class
+so classes can be referenced in the code. They should be placed above the part
+where the code says <script type="text/javascript">. If you don't know how to
+call them or where to place them, refer to level1.html at lines 15-17
+
+7. Now test the build to make sure it runs. Ensure that everything spawns into
+the game and that the proper enemies are spawned.
+
+8. Once everything is done, put everything in to the FinalBuild folder!
+
+Common issues:
+-Scoping is messed up. '../assets' is called in the levelDesign folder and
+looks for the directory above it.
+-Some asset names might not be found, normally because the names for those
+assets in the game are different than the ones you have saved. Make sure
+you copy the git assets over as EXACTLY as they're called.
+-Unreferenced variables in classes normally mean you spawned something into the
+game without instantiating a class correctly. Refer to step 4 on how the
+structure is supposed to be.
