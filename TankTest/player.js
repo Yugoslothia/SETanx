@@ -20,6 +20,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 		this.playerHead = new PlayerHead(scene, this.x, this.y);
 		this.dead = false;
 		this.reticle = scene.physics.add.sprite(500, 175, 'target');
+    scene.physics.add.collider(this, enemyBullets, this.playerKill, null, this);
 		this.cursors = scene.input.keyboard.addKeys({
 			up:Phaser.Input.Keyboard.KeyCodes.W,
 			down:Phaser.Input.Keyboard.KeyCodes.S,
@@ -91,19 +92,27 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 	shoot() {
 		var bullet;
 		var direction;
-		if(bullets.countActive(true) < 1) {
-			bullet = bullets.create(this.playerHead.x-30, this.playerHead.y);
+		if(bullets.countActive(true) < 5) {
+      bullet = bullets.create(this.x-30, this.y).setScale(0.3);
 			bullet.body.setCollideWorldBounds(true).bounce.set(1);
-			direction = Math.atan((this.reticle.x-bullet.x)/(this.reticle.y-bullet.x));
-			if(this.reticle.y >= bullet.y) {
-				bullet.setVelocityX(175*Math.sin(direction));
-				bullet.setVelocityY(175*Math.cos(direction));
-			}
-			else {
-				bullet.setVelocityX(-175*Math.sin(direction));
-				bullet.setVelocityY(-175*Math.cos(direction));
-			}
+      direction = Math.atan((this.reticle.y-bullet.y)/(this.reticle.x-bullet.x));
+			bullet.setVelocityX(175 * Math.cos(direction));
+      bullet.setVelocityY(175 * Math.sin(direction));
+      if(this.reticle.x - bullet.x < 0 && this.reticle.y - bullet.y >= 0) {
+        bullet.setVelocityY(-175 * Math.sin(direction));
+        bullet.setVelocityX(-175 * Math.cos(direction));
+      }
+      if(this.reticle.x - bullet.x < 0 && this.reticle.y - bullet.y < 0) {
+        bullet.setVelocityY(-175 * Math.sin(direction));
+        bullet.setVelocityX(-175 * Math.cos(direction));
+      }
 
 		}
 	}
+
+  playerKill(enemyBullets) {
+    this.dead = true;
+  }
+
+  isDead() {return this.dead;}
 }
