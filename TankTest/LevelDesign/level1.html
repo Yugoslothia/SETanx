@@ -1,8 +1,9 @@
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Tank test</title>
+    <title>Level 1</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -11,13 +12,11 @@
     </style>
 </head>
 <body>
-
+<script type="text/javascript" src="ai.js?v=2"></script>
+<script type="text/javascript" src="player.js?v=2"></script>
 <script type="text/javascript">
-
-  // set variables to reference for sprite placement
-  var width = 800
-  var height = 750
-
+    var width = 800;
+    var height = 900;
     var config = {
         type: Phaser.AUTO,
         width: width,
@@ -26,7 +25,7 @@
 			default: 'arcade',
 			arcade: {
 				gravity: false,
-				debug: true
+				debug: false
 			}
 		},
         scene: {
@@ -35,91 +34,95 @@
             update: update
         }
     };
-
+    //var gameOver = false;
     var game = new Phaser.Game(config);
+
     function preload () {
-		this.load.image('tank', '../assets/Tank.png');
-		this.load.image('background', '../assets/floorbackground.png');
-		this.load.image('wall', '../assets/sandbags.png');
-		this.load.image('vertWall', '../assets/sandbagsvert.png');
-		this.load.image("bullet", '../assets/new_bullet.png');
-    this.load.image('borderwall', '../assets/wall.png');
-    this.load.image('borderwallvert', '../assets/wallvert.png');
-    this.load.image('enemy', '../assets/EnemyTankBody.png');
-    this.load.image('enemycannon', '../assets/EnemyTankHead.png');
-    this.load.image('breakableWall', '../assets/razorWire.png');
-    this.load.image('speedBoost', '../assets/speedBoost.png');
-    this.load.image('shield', '../assets/shield.png');
-    this.load.image('minimize', '../assets/minimize.png');
-    this.load.image('slowEnemies', '../assets/slowEnemies.png');
+		this.load.image('tank', 'assets/playerTankBody.png');
+    this.load.image('tankHead', 'assets/playerTankHead.png')
+		this.load.image('background', 'assets/floorbackground.png');
+		this.load.image('wall', 'assets/sandbags.png');
+		this.load.image('vertWall', 'assets/sandbagsvert.png');
+		this.load.image("bullet", 'assets/new_bullet.png');
+    this.load.image('borderwall', 'assets/wall.png');
+    this.load.image('borderwallvert', 'assets/wallvert.png');
+    this.load.image('breakableWall', 'assets/razorWire.png');
+    this.load.image('speedBoost', 'assets/speedBoost.png');
+    this.load.image('shield', 'assets/shield.png');
+    this.load.image('minimize', 'assets/minimize.png');
+    this.load.image('slowEnemies', 'assets/slowEnemies.png');
+    this.load.image('enemyBullet', 'assets/enemyBullet.png');
+    this.load.image('enemy', 'assets/EnemyTankBody.png');
+    this.load.image('enemyHead', 'assets/EnemyTankHead.png');
+    this.load.image('enemy2', 'assets/EnemyTankBody2.png');
+    this.load.image('enemyHead2', 'assets/EnemyTankHead2.png');
+    this.load.image('enemy3', 'assets/EnemyTankBody3.png');
+    this.load.image('enemyHead3', 'assets/EnemyTankHead3.png');
+    this.load.image('enemy4', 'assets/EnemyTankBody4.png');
+    this.load.image('enemyHead4', 'assets/EnemyTankHead4.png');
+    this.load.image('evilChris', 'assets/evilChris.png');
+		this.load.image('target', 'assets/crosshair.png');
     }
 
     function create () {
-		this.add.image(width/2,height/2, 'background').setScale();
+  		this.add.image(width/2,height/2, 'background').setScale(1.2);
 
-		walls = this.physics.add.staticGroup();
-    addBorder();
-		addWalls();
+  		walls = this.physics.add.staticGroup();
+      addBorder();
+  		addWalls();
 
-		player = this.physics.add.sprite(width/4, height/4, 'tank');
-    enemy = this.physics.add.sprite(width*3/4, height/4, 'enemy').setScale(0.4);
-    enemy = this.physics.add.sprite(width*3/4 + 20, height/4, 'enemycannon').setScale(0.4);
-		player.setCollideWorldBounds(true);
+      bullets = this.physics.add.group({
+  			defaultKey: 'bullet',
+  			maxSize: 4000
+  		});
+      enemyBullets = this.physics.add.group({
+  			defaultKey: 'enemyBullet',
+  			maxSize: 4000
+  		});
 
-		this.physics.add.collider(player, walls);
-		cursor = this.input.keyboard.createCursorKeys();
+      this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
+      this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
 
-		bullets = this.physics.add.group({
-			defaultKey: 'bullet',
-			maxSize: 5
-		});
-		this.physics.add.collider(bullets, walls);
-		spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+  		player = new Player(this, width/4, height/4);
+
+      ai = new Ai(this, width*3/4, height/4).setScale(0.4);
+      enemy = new AiStill(this, width*3/4 + 100, height/4).setScale(0.4);
+
     }
 
     function update () {
-		movePlayer();
-		shoot();
+      if(ai.isDead() && enemy.isDead()){
+        this.physics.pause();
+      }
+      if(player.isDead()) {
+        this.scene.restart();
+      }
     }
 
+    function ebulletDestroy(walls, enemyBullet){
+      enemyBullet.disableBody(true, true);
+    }
 
-	function addWalls() {
-    // walls are 240x40
-    // vertWalls are 40x240
-    // left these y coordinates as 100 & 320 so that there wouldn't be a gap along the background if it gets resized
-		walls.create(width/2, 120, 'vertWall').setScale(0.4).refreshBody();
-    walls.create(width/2, 340, 'vertWall').setScale(0.4).refreshBody();
-	}
+    function bulletDestroy(walls, bullet){
+      bullet.disableBody(true, true);
+    }
 
-
-  function addBorder() {
-    // border is offset +/- 125 around edges, so it overlaps the screen by 10
-    walls.create(0, -125, 'borderwall').setScale().refreshBody();
-    walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
-    walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
-    walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
-  }
+  	function addWalls() {
+      // walls are 240x40
+      // vertWalls are 40x240
+      // left these y coordinates as 100 & 320 so that there wouldn't be a gap along the background if it gets resized
+  		walls.create(width/2, 110, 'vertWall').setScale(0.4).refreshBody();
+      walls.create(width/2, 330, 'vertWall').setScale(0.4).refreshBody();
+  	}
 
 
-	function shoot() {
-		var bullet;
-		if (bullets.countActive(true) < 5 && Phaser.Input.Keyboard.JustDown(spacebar)) {
-			bullet = this.bullets.create(player.x-10, player.y);
-			bullet.body.setVelocityY(Phaser.Math.Between(-200,200));
-			bullet.body.setVelocityX(-150);
-			bullet.body.setCollideWorldBounds(true).bounce.set(1);
-		}
-	}
-
-	function movePlayer() {
-		if(cursor.left.isDown) { player.setVelocityX(-100);}
-		else if (cursor.right.isDown) { player.setVelocityX(100);}
-		else if (cursor.down.isDown) { player.setVelocityY(100);}
-		else if (cursor.up.isDown) { player.setVelocityY(-100);}
-		else {
-			player.setVelocity(0);
-		}
-	}
+    function addBorder() {
+      // border is offset +/- 125 around edges, so it overlaps the screen by 10
+      walls.create(0, -125, 'borderwall').setScale().refreshBody();
+      walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
+      walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
+      walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
+    }
 
 </script>
 
