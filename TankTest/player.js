@@ -19,6 +19,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 		this.pointer = scene.input.activePointer;
 		this.playerHead = new PlayerHead(scene, this.x, this.y);
 		this.dead = false;
+		this.shootPosX = 0;
+		this.shootPosY = 0;
 		this.reticle = scene.physics.add.sprite(500, 175, 'target');
     scene.physics.add.collider(this, enemyBullets, this.playerKill, null, this);
 		this.cursors = scene.input.keyboard.addKeys({
@@ -43,6 +45,23 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 		this.reticle.x += this.pointer.movementX;
 		this.reticle.y += this.pointer.movementY;
 		this.playerHead.rotation = Phaser.Math.Angle.Between(this.playerHead.x, this.playerHead.y, this.reticle.x, this.reticle.y);
+
+		if(this.playerHead.rotation >= 0 && this.playerHead.rotation < 1.5708) {
+			this.shootPosX = 70*Math.cos(this.playerHead.rotation);
+			this.shootPosY = 70*Math.sin(this.playerHead.rotation);
+		}
+		else if(this.playerHead.rotation >= 1.5708 && this.playerHead.rotation < 3.14158) {
+			this.shootPosX = 68*Math.cos(this.playerHead.rotation);
+			this.shootPosY = 70*Math.sin(this.playerHead.rotation);
+		}
+		else if(this.playerHead.rotation >= -3.14158 && this.playerHead.rotation < -1.5708) {
+			this.shootPosX = 68*Math.cos(this.playerHead.rotation);
+			this.shootPosY = 70*Math.sin(this.playerHead.rotation);
+		}
+		else if(this.playerHead.rotation >= -1.5708 && this.playerHead.rotation < 0) {
+			this.shootPosX = 70*Math.cos(this.playerHead.rotation);
+			this.shootPosY = 70*Math.sin(this.playerHead.rotation);
+		}
 	}
 
 	movePlayer() {
@@ -92,8 +111,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 	shoot() {
 		var bullet;
 		var direction;
-		if(bullets.countActive(true) < 5) {
-      bullet = bullets.create(this.x-30, this.y).setScale(0.3);
+		if(bullets.countActive(true) < 50) {
+      bullet = bullets.create(this.x+this.shootPosX, this.y+this.shootPosY).setScale(0.3);
 			bullet.body.setCollideWorldBounds(true).bounce.set(1);
       direction = Math.atan((this.reticle.y-bullet.y)/(this.reticle.x-bullet.x));
 			bullet.setVelocityX(175 * Math.cos(direction));
