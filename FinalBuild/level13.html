@@ -1,9 +1,8 @@
-
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Level 1</title>
+    <title>Level 13</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -15,8 +14,11 @@
 <script type="text/javascript" src="ai.js?v=2"></script>
 <script type="text/javascript" src="player.js?v=2"></script>
 <script type="text/javascript">
-    var width = 800;
-    var height = 750;
+
+  // set variables to reference for sprite placement
+  var width = 800
+  var height = 750
+
     var config = {
         type: Phaser.AUTO,
         width: width,
@@ -25,7 +27,7 @@
 			default: 'arcade',
 			arcade: {
 				gravity: false,
-				debug: false
+				debug: true
 			}
 		},
         scene: {
@@ -34,16 +36,15 @@
             update: update
         }
     };
-    //var gameOver = false;
-    var game = new Phaser.Game(config);
 
+    var game = new Phaser.Game(config);
     function preload () {
-		this.load.image('tank', 'assets/playerTankBody.png');
+    this.load.image('tank', 'assets/playerTankBody.png');
     this.load.image('tankHead', 'assets/playerTankHead.png')
-		this.load.image('background', 'assets/floorbackground.png');
-		this.load.image('wall', 'assets/sandbags.png');
-		this.load.image('vertWall', 'assets/sandbagsvert.png');
-		this.load.image("bullet", 'assets/new_bullet.png');
+    this.load.image('background', 'assets/floorbackground.png');
+    this.load.image('wall', 'assets/sandbags.png');
+    this.load.image('vertWall', 'assets/sandbagsvert.png');
+    this.load.image("bullet", 'assets/new_bullet.png');
     this.load.image('borderwall', 'assets/wall.png');
     this.load.image('borderwallvert', 'assets/wallvert.png');
     this.load.image('breakableWall', 'assets/razorWire.png');
@@ -61,24 +62,24 @@
     this.load.image('enemy4', 'assets/EnemyTankBody4.png');
     this.load.image('enemyHead4', 'assets/EnemyTankHead4.png');
     this.load.image('evilChris', 'assets/evilChris.png');
-		this.load.image('target', 'assets/crosshair.png');
+    this.load.image('target', 'assets/crosshair.png');
     }
 
     function create () {
-  		this.add.image(width/2,height/2, 'background').setScale(1.2);
+      this.add.image(width/2,height/2, 'background').setScale(1.2);
 
-  		walls = this.physics.add.staticGroup();
+      walls = this.physics.add.staticGroup();
       addBorder();
-  		addWalls();
+      addWalls();
 
       bullets = this.physics.add.group({
-  			defaultKey: 'bullet',
-  			maxSize: 4000
-  		});
+        defaultKey: 'bullet',
+        maxSize: 4000
+      });
       enemyBullets = this.physics.add.group({
-  			defaultKey: 'enemyBullet',
-  			maxSize: 4000
-  		});
+        defaultKey: 'enemyBullet',
+        maxSize: 4000
+      });
 
       this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
       this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
@@ -86,18 +87,18 @@
       this.physics.add.overlap(walls, bullets, bulletDestroy, null, this);
       this.physics.add.overlap(walls, enemyBullets, ebulletDestroy, null, this);
 
-  		player = new Player(this, width/4, height/4);
-
-      ai = new AiStill(this, width*3/4, height/4).setScale(0.4);
-      called = false;
-
+    // all enemy cannons are offset +20 pixels from body
+      player = new Player(this, width/4, height/6);
+      enemy1 = new AiFastMoving(this, width*3/4, height/2).setScale(0.4);
+      called = false
     }
 
     function update () {
-      if(ai.isDead() && called == false){
-        window.location.href = "level2.html"
+      if(enemy1.isDead() && !called){
+        window.location.href = "level14.html";
         called = true;
       }
+
       if(player.isDead()) {
         this.scene.restart();
       }
@@ -116,23 +117,37 @@
       bullet.disableBody(true, true);
     }
 
-  	function addWalls() {
-      // walls are 240x40
-      // vertWalls are 40x240
-      // left these y coordinates as 100 & 320 so that there wouldn't be a gap along the background if it gets resized
-  		walls.create(width/2, 110, 'vertWall').setScale(0.4).refreshBody();
-      walls.create(width/2, 330, 'vertWall').setScale(0.4).refreshBody();
-  	}
+	function addWalls() {
+    // walls are 240x40
+    // vertWalls are 40x240
+    walls.create(width/2, 120, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height-120, 'vertWall').setScale(0.4).refreshBody();
+
+    //add breakable walls in squares through opening
+    walls.create(width/2, 255, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 295, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 335, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 375, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 415, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 455, 'breakableWallSquare').setScale(0.25).refreshBody();
+    walls.create(width/2, 495, 'breakableWallSquare').setScale(0.25).refreshBody();
+
+	}
+
+  function addBreakWalls() {
+    //walls.create(width/2, height/2, 'breakableWall').setScale(0.4).refreshBody();
+  }
 
 
-    function addBorder() {
-      // border is offset +/- 125 around edges, so it overlaps the screen by 10
-      walls.create(0, -125, 'borderwall').setScale().refreshBody();
-      walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
-      walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
-      walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
-    }
+  function addBorder() {
+    // border is offset +/- 125 around edges, so it overlaps the screen by 10
+    walls.create(0, -125, 'borderwall').setScale().refreshBody();
+    walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
+    walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
+    walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
+  }
 
 </script>
+
 </body>
 </html>
