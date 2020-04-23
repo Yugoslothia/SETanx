@@ -92,11 +92,14 @@
       enemy3 = new Ai(this, width*5/6, height*3/4).setScale(0.4);
       enemy4 = new Ai(this, width*5/6+150, height*3/4).setScale(0.4);
 
+      called = false;
     }
 
     function update () {
-      if(enemy1.isDead() && enemy2.isDead() && enemy3.isDead() && enemy4.isDead()){
+      if(enemy1.isDead() && enemy2.isDead() && enemy3.isDead() && enemy4.isDead() && !called){
         this.physics.pause();
+        window.location.href = "level10.html";
+        called = true;
       }
       if(player.isDead()) {
         this.scene.restart();
