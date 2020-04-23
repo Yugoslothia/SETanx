@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Tank test</title>
+    <title>Level 9</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -27,7 +27,7 @@
 			default: 'arcade',
 			arcade: {
 				gravity: false,
-				debug: true
+				debug: false
 			}
 		},
         scene: {
@@ -83,13 +83,14 @@
 
       this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
       this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
+      this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
 
       player = new Player(this, width/4, height/4);
 
       enemy1 = new Ai(this, width/2, height/2).setScale(0.4);
-      enemy2 = new Ai(this, width/2+20, height/2).setScale(0.4);
+      enemy2 = new Ai(this, width/2+250., height/2).setScale(0.4);
       enemy3 = new Ai(this, width*5/6, height*3/4).setScale(0.4);
-      enemy4 = new Ai(this, width*5/6+20, height*3/4).setScale(0.4);
+      enemy4 = new Ai(this, width*5/6+150, height*3/4).setScale(0.4);
 
     }
 
@@ -100,6 +101,11 @@
       if(player.isDead()) {
         this.scene.restart();
       }
+    }
+
+    function bothDestroy(enemyBullet, bullet){
+      bullet.disableBody(true, true);
+      enemyBullet.disableBody(true, true);
     }
 
     function ebulletDestroy(walls, enemyBullet){

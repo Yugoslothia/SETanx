@@ -21,34 +21,37 @@ class Ai extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.collider(this, walls);
     this.aiHead = new AiHead(scene, this.x, this.y).setScale(0.4);
     this.dead = false;
-    scene.physics.add.collider(this, bullets, this.aiKill, null, this);
-
+    scene.physics.add.collider(bullets, this, this.aiKill, bulletDestroy, this);
+    this.start = true;
     this.timedEvent = scene.time.addEvent({ delay: 2000, callback: this.shootAI, callbackScope: this, loop: true });
   }
 
   preUpdate(time, delta) {
     super.preUpdate(time, delta);
-    if(this.dead == false) {this.moveAI();}
+    if(this.dead == false) {this.moveAI(this.start);}
     this.aiHead.rotation = Phaser.Math.Angle.Between(this.aiHead.x, this.aiHead.y, player.x, player.y);
     this.aiHead.x = this.x;
     this.aiHead.y = this.y;
   }
 
   moveAI() {
-    if(this.body.velocity.x == 0) {
-      this.setVelocityX(100);
-      this.oldx = this.x;
-      this.oldy = this.y;
-    }
+
     // randomly moves ai whenever it moves 100 pixels in y or x dir on dir change
     if(this.x - this.oldx > 100 || this.x - this.oldx < -100 || this.y - this.oldy > 100 || this.y - this.oldy < -100
-        || (this.x == this.oldx && this.y == this.oldy)) {
+        || (this.body.velocity.x == 0 && this.body.velocity.y == 0)) {
       this.dirx = Phaser.Math.Between(-1, 1);
       this.diry = Phaser.Math.Between(-1, 1);
-      while(this.dirx == 0 && this.diry == 0) {
-        this.dirx = Phaser.Math.Between(-1, 1);
-        this.diry = Phaser.Math.Between(-1, 1);
-      }
+
+      // sets angle of sprite relative to direction
+      if(this.dirx == 0 && this.diry == 1) {this.setAngle(90);}
+      else if(this.dirx == -1 && this.diry == 1) {this.setAngle(135);}
+      else if(this.dirx == -1 && this.diry == 0) {this.setAngle(180);}
+      else if(this.dirx == -1 && this.diry == -1) {this.setAngle(225);}
+      else if(this.dirx == 0 && this.diry == -1) {this.setAngle(270);}
+      else if(this.dirx == 1 && this.diry == -1) {this.setAngle(315);}
+      else if(this.dirx == 1 && this.diry == 0) {this.setAngle(0);}
+      else if(this.dirx == 1 && this.diry == 1) {this.setAngle(45);}
+
       if(Math.abs(this.dirx) == Math.abs(this.diry)) {
         this.dirx *= Math.sqrt(2) / 2;
         this.diry *= Math.sqrt(2) / 2;
@@ -57,7 +60,9 @@ class Ai extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityY(100 * this.diry);
       this.oldx = this.x;
       this.oldy = this.y;
+
     }
+
   }
 
   // shoots in the direction of the player and spawns unique bullet
@@ -78,8 +83,7 @@ class Ai extends Phaser.Physics.Arcade.Sprite {
   }
 
   aiKill(bullet) {
-    bullet.x = -100;
-    bullet.y = -100;
+    bullet.disableBody(true, true);
     this.disableBody(true, true);
     this.aiHead.disableBody(true, true);
     this.timedEvent.remove();
@@ -109,7 +113,7 @@ class AiFastBullet extends Ai {
     super(scene, x, y, 'enemy3');
     this.setTexture('enemy3');
     this.aiHead.setTexture('enemyHead3').setScale(0.4);
-    scene.physics.add.collider(this, bullets, this.aiKill, null, this);
+    scene.physics.add.collider(bullets, this, this.aiKill, null, this);
     this.timedEvent.remove(); // automatically inherits old timed event, so remove it
     this.timedEvent2 = scene.time.addEvent({ delay: 3000, callback: this.shootAI, callbackScope: this, loop: true });
   }
@@ -149,20 +153,21 @@ class AiFastMoving extends Ai {
   }
 
   moveAI() {
-    if(this.body.velocity.x == 0) {
-      this.setVelocityX(200);
-      this.oldx = this.x;
-      this.oldy = this.y;
-    }
-    // randomly moves ai whenever it moves 100 pixels in y or x dir on dir change
     if(this.x - this.oldx > 200 || this.x - this.oldx < -200 || this.y - this.oldy > 200 || this.y - this.oldy < -200
-        || (this.x == this.oldx && this.y == this.oldy)) {
+        || (this.body.velocity.x == 0 && this.body.velocity.y == 0)) {
       this.dirx = Phaser.Math.Between(-1, 1);
       this.diry = Phaser.Math.Between(-1, 1);
-      while(this.dirx == 0 && this.diry == 0) {
-        this.dirx = Phaser.Math.Between(-1, 1);
-        this.diry = Phaser.Math.Between(-1, 1);
-      }
+
+      // sets angle of sprite relative to direction
+      if(this.dirx == 0 && this.diry == 1) {this.setAngle(90);}
+      else if(this.dirx == -1 && this.diry == 1) {this.setAngle(135);}
+      else if(this.dirx == -1 && this.diry == 0) {this.setAngle(180);}
+      else if(this.dirx == -1 && this.diry == -1) {this.setAngle(225);}
+      else if(this.dirx == 0 && this.diry == -1) {this.setAngle(270);}
+      else if(this.dirx == 1 && this.diry == -1) {this.setAngle(315);}
+      else if(this.dirx == 1 && this.diry == 0) {this.setAngle(0);}
+      else if(this.dirx == 1 && this.diry == 1) {this.setAngle(45);}
+
       if(Math.abs(this.dirx) == Math.abs(this.diry)) {
         this.dirx *= Math.sqrt(2) / 2;
         this.diry *= Math.sqrt(2) / 2;
@@ -171,6 +176,7 @@ class AiFastMoving extends Ai {
       this.setVelocityY(200 * this.diry);
       this.oldx = this.x;
       this.oldy = this.y;
+
     }
   }
 }
@@ -195,20 +201,21 @@ class EvilChris extends Phaser.Physics.Arcade.Sprite {
     }
 
     moveAI() {
-      if(this.body.velocity.x == 0) {
-        this.setVelocityX(200);
-        this.oldx = this.x;
-        this.oldy = this.y;
-      }
-      // randomly moves ai whenever it moves 100 pixels in y or x dir on dir change
       if(this.x - this.oldx > 100 || this.x - this.oldx < -100 || this.y - this.oldy > 100 || this.y - this.oldy < -100
-          || (this.x == this.oldx && this.y == this.oldy)) {
+          || (this.body.velocity.x == 0 && this.body.velocity.y == 0)) {
         this.dirx = Phaser.Math.Between(-1, 1);
         this.diry = Phaser.Math.Between(-1, 1);
-        while(this.dirx == 0 && this.diry == 0) {
-          this.dirx = Phaser.Math.Between(-1, 1);
-          this.diry = Phaser.Math.Between(-1, 1);
-        }
+
+        // sets angle of sprite relative to direction
+        if(this.dirx == 0 && this.diry == 1) {this.setAngle(90);}
+        else if(this.dirx == -1 && this.diry == 1) {this.setAngle(135);}
+        else if(this.dirx == -1 && this.diry == 0) {this.setAngle(180);}
+        else if(this.dirx == -1 && this.diry == -1) {this.setAngle(225);}
+        else if(this.dirx == 0 && this.diry == -1) {this.setAngle(270);}
+        else if(this.dirx == 1 && this.diry == -1) {this.setAngle(315);}
+        else if(this.dirx == 1 && this.diry == 0) {this.setAngle(0);}
+        else if(this.dirx == 1 && this.diry == 1) {this.setAngle(45);}
+
         if(Math.abs(this.dirx) == Math.abs(this.diry)) {
           this.dirx *= Math.sqrt(2) / 2;
           this.diry *= Math.sqrt(2) / 2;
@@ -217,6 +224,7 @@ class EvilChris extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityY(200 * this.diry);
         this.oldx = this.x;
         this.oldy = this.y;
+
       }
     }
 

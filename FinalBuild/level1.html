@@ -82,6 +82,7 @@
 
       this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
       this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
+      this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
 
   		player = new Player(this, width/4, height/4);
 
@@ -97,6 +98,11 @@
       if(player.isDead()) {
         this.scene.restart();
       }
+    }
+
+    function bothDestroy(enemyBullet, bullet){
+      bullet.disableBody(true, true);
+      enemyBullet.disableBody(true, true);
     }
 
     function ebulletDestroy(walls, enemyBullet){
