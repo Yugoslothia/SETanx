@@ -27,7 +27,7 @@
 			default: 'arcade',
 			arcade: {
 				gravity: false,
-				debug: true
+				debug: false
 			}
 		},
         scene: {
@@ -120,17 +120,10 @@
 	function addWalls() {
     // walls are 240x40
     // vertWalls are 40x240
-    walls.create(width/2, 120, 'vertWall').setScale(0.4).refreshBody();
-    walls.create(width/2, height-120, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, 80, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height-80, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height/2, 'vertWall').setScale(0.4).refreshBody();
 
-    //add breakable walls in squares through opening
-    walls.create(width/2, 255, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 295, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 335, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 375, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 415, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 455, 'breakableWallSquare').setScale(0.25).refreshBody();
-    walls.create(width/2, 495, 'breakableWallSquare').setScale(0.25).refreshBody();
 
 	}
 
