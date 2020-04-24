@@ -90,15 +90,14 @@
 
       player = new Player(this, width/5, height/2);
 
-      ai = new AiStill(this, width*4/5 - 40, height/2).setScale(0.4);
-      enemy = new AiStill(this, width*4/5 + 50, height/2).setScale(0.4);
+      ai = new Ai(this, width*4/5, height/2).setScale(0.4);
 
       called = false
 
     }
 
     function update () {
-      if(ai.isDead() && enemy.isDead() && !called){
+      if(ai.isDead() && !called){
         this.physics.pause();
         alert("Stage  Access Key: the")
         window.location.href = "../stageSelection.html";
