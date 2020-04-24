@@ -1,0 +1,40 @@
+
+@font-face {
+  font-family: optionsFont;
+  src: url(../fonts/VCR_OSD_MONO_1.001.ttf);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-image: url(../floorbackground.png);
+  text-align: center;
+}
+
+h2 {
+  font-family: optionsFont;
+  font-size: 35px;
+  color: red;
+}
+
+ul {
+  font-family: optionsFont;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  font-size: 25px;
+  color: black;
+}
+
+a {
+  font-family: optionsFont;
+  font-size: 35px;
+  color: blue;
+  text-decoration: none;
+}
+
+a:visited {
+  color: blue:
+}
