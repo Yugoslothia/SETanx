@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tank test</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="ai.js?v=2"></script>
+<script type="text/javascript" src="player.js?v=2"></script>
+<script type="text/javascript">
+
+  // set variables to reference for sprite placement
+  var width = 800
+  var height = 750
+
+    var config = {
+        type: Phaser.AUTO,
+        width: width,
+        height: height,
+		physics: {
+			default: 'arcade',
+			arcade: {
+				gravity: false,
+				debug: false
+			}
+		},
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+    var game = new Phaser.Game(config);
+        function preload () {
+    		this.load.image('tank', 'assets/playerTankBody.png');
+        this.load.image('tankHead', 'assets/playerTankHead.png')
+    		this.load.image('background', 'assets/floorbackground.png');
+    		this.load.image('wall', 'assets/sandbags.png');
+    		this.load.image('vertWall', 'assets/sandbagsvert.png');
+    		this.load.image("bullet", 'assets/new_bullet.png');
+        this.load.image('borderwall', 'assets/wall.png');
+        this.load.image('borderwallvert', 'assets/wallvert.png');
+        this.load.image('breakableWall', 'assets/razorWire.png');
+        this.load.image('speedBoost', 'assets/speedBoost.png');
+        this.load.image('shield', 'assets/shield.png');
+        this.load.image('minimize', 'assets/minimize.png');
+        this.load.image('slowEnemies', 'assets/slowEnemies.png');
+        this.load.image('enemyBullet', 'assets/enemyBullet.png');
+        this.load.image('enemy', 'assets/EnemyTankBody.png');
+        this.load.image('enemyHead', 'assets/EnemyTankHead.png');
+        this.load.image('enemy2', 'assets/EnemyTankBody2.png');
+        this.load.image('enemyHead2', 'assets/EnemyTankHead2.png');
+        this.load.image('enemy3', 'assets/EnemyTankBody3.png');
+        this.load.image('enemyHead3', 'assets/EnemyTankHead3.png');
+        this.load.image('enemy4', 'assets/EnemyTankBody4.png');
+        this.load.image('enemyHead4', 'assets/EnemyTankHead4.png');
+        this.load.image('evilChris', 'assets/evilChris.png');
+    		this.load.image('target', 'assets/crosshair.png');
+        }
+
+        function create () {
+    		this.add.image(width/2,height/2, 'background').setScale();
+
+    		walls = this.physics.add.staticGroup();
+        addBorder();
+    		addWalls();
+
+        bullets = this.physics.add.group({
+      			defaultKey: 'bullet',
+      			maxSize: 4000
+      		});
+          enemyBullets = this.physics.add.group({
+      			defaultKey: 'enemyBullet',
+      			maxSize: 4000
+      		});
+
+          this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
+          this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
+          this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
+          this.physics.add.overlap(walls, bullets, bulletDestroy, null, this);
+          this.physics.add.overlap(walls, enemyBullets, ebulletDestroy, null, this);
+
+          player = new Player(this, width/4, height/4);
+
+          ai = new Ai(this, width*4/5, height/2).setScale(0.4);
+
+          called = false;
+        }
+
+        function update () {
+          if(ai.isDead()  && !called){
+            this.physics.pause();
+            alert("Stage 5 Access Key: me")
+            window.location.href = "stageSelection.html";
+            called = true;
+          }
+          if(player.isDead()) {
+            alert("you been shot");
+            this.scene.restart();
+          }
+        }
+
+        function bothDestroy(enemyBullet, bullet){
+          bullet.disableBody(true, true);
+          enemyBullet.disableBody(true, true);
+        }
+
+        function ebulletDestroy(walls, enemyBullet){
+          enemyBullet.disableBody(true, true);
+        }
+
+        function bulletDestroy(walls, bullet){
+          bullet.disableBody(true, true);
+        }
+
+	function addWalls() {
+    // walls are 240x40
+    // vertWalls are 40x240
+    walls.create(width/2, height/2-75, 'vertWall').setScale(0.4).refreshBody();
+    walls.create(width/2, height/2+75, 'vertWall').setScale(0.4).refreshBody();
+	}
+
+
+  function addBorder() {
+    // border is offset +/- 125 around edges, so it overlaps the screen by 10
+    walls.create(0, -125, 'borderwall').setScale().refreshBody();
+    walls.create(0, height + 125, 'borderwall').setScale().refreshBody();
+    walls.create(-125, 0, 'borderwallvert').setScale().refreshBody();
+    walls.create(width + 125, 0, 'borderwallvert').setScale().refreshBody();
+  }
+
+</script>
+
+</body>
+</html>
