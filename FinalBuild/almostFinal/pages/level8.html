@@ -84,6 +84,9 @@
           this.physics.add.collider(walls, bullets, bulletDestroy, null, this);
           this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
           this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
+	  this.physics.add.overlap(walls, enemyBullets, ebulletDestroy, null, this);
+          this.physics.add.overlap(enemyBullets, bullets, bothDestroy, null, this);
+
 
       		player = new Player(this, width/4, height/2);
 
