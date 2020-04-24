@@ -85,7 +85,7 @@
       this.physics.add.collider(walls, enemyBullets, ebulletDestroy, null, this);
       this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
       this.physics.add.overlap(walls, enemyBullets, ebulletDestroy, null, this);
-      this.physics.add.overlap(enemyBullets, bullets, bothDestroy, null, this);
+      this.physics.add.overlap(walls, bullets, bulletDestroy, null, this);
 
       player = new Player(this, width/4, height/4);
 
@@ -98,7 +98,7 @@
     function update () {
       if(enemy1.isDead() && enemy2.isDead()  && !called){
         this.physics.pause();
-        alert("Stage 3 Access Key: roll")
+        alert("Stage 10 Access Key: roll")
         window.location.href = "stageSelection.html";
         called = true;
       }
