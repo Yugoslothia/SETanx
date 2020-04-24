@@ -40,30 +40,30 @@
     var game = new Phaser.Game(config);
 
     function preload () {
-		this.load.image('tank', '../assets/playerTankBody.png');
-    this.load.image('tankHead', '../assets/playerTankHead.png')
-		this.load.image('background', '../assets/floorbackground.png');
-		this.load.image('wall', '../assets/sandbags.png');
-		this.load.image('vertWall', '../assets/sandbagsvert.png');
-		this.load.image("bullet", '../assets/new_bullet.png');
-    this.load.image('borderwall', '../assets/wall.png');
-    this.load.image('borderwallvert', '../assets/wallvert.png');
-    this.load.image('breakableWall', '../assets/razorWire.png');
-    this.load.image('speedBoost', '../assets/speedBoost.png');
-    this.load.image('shield', '../assets/shield.png');
-    this.load.image('minimize', '../assets/minimize.png');
-    this.load.image('slowEnemies', '../assets/slowEnemies.png');
-    this.load.image('enemyBullet', '../assets/enemyBullet.png');
-    this.load.image('enemy', '../assets/EnemyTankBody.png');
-    this.load.image('enemyHead', '../assets/EnemyTankHead.png');
-    this.load.image('enemy2', '../assets/EnemyTankBody2.png');
-    this.load.image('enemyHead2', '../assets/EnemyTankHead2.png');
-    this.load.image('enemy3', '../assets/EnemyTankBody3.png');
-    this.load.image('enemyHead3', '../assets/EnemyTankHead3.png');
-    this.load.image('enemy4', '../assets/EnemyTankBody4.png');
-    this.load.image('enemyHead4', '../assets/EnemyTankHead4.png');
-    this.load.image('evilChris', '../assets/evilChris.png');
-		this.load.image('target', '../assets/crosshair.png');
+		this.load.image('tank', 'assets/playerTankBody.png');
+    this.load.image('tankHead', 'assets/playerTankHead.png')
+		this.load.image('background', 'assets/floorbackground.png');
+		this.load.image('wall', 'assets/sandbags.png');
+		this.load.image('vertWall', 'assets/sandbagsvert.png');
+		this.load.image("bullet", 'assets/new_bullet.png');
+    this.load.image('borderwall', 'assets/wall.png');
+    this.load.image('borderwallvert', 'assets/wallvert.png');
+    this.load.image('breakableWall', 'assets/razorWire.png');
+    this.load.image('speedBoost', 'assets/speedBoost.png');
+    this.load.image('shield', 'assets/shield.png');
+    this.load.image('minimize', 'assets/minimize.png');
+    this.load.image('slowEnemies', 'assets/slowEnemies.png');
+    this.load.image('enemyBullet', 'assets/enemyBullet.png');
+    this.load.image('enemy', 'assets/EnemyTankBody.png');
+    this.load.image('enemyHead', 'assets/EnemyTankHead.png');
+    this.load.image('enemy2', 'assets/EnemyTankBody2.png');
+    this.load.image('enemyHead2', 'assets/EnemyTankHead2.png');
+    this.load.image('enemy3', 'assets/EnemyTankBody3.png');
+    this.load.image('enemyHead3', 'assets/EnemyTankHead3.png');
+    this.load.image('enemy4', 'assets/EnemyTankBody4.png');
+    this.load.image('enemyHead4', 'assets/EnemyTankHead4.png');
+    this.load.image('evilChris', 'assets/evilChris.png');
+		this.load.image('target', 'assets/crosshair.png');
     }
 
     function create () {
@@ -87,7 +87,7 @@
       this.physics.add.collider(enemyBullets, bullets, bothDestroy, null, this);
       this.physics.add.overlap(walls, bullets, bulletDestroy, null, this);
       this.physics.add.overlap(walls, enemyBullets, ebulletDestroy, null, this);
-      
+
   		player = new Player(this, width/4, height/4);
 
       ai1 = new AiStill(this, width*4/5, height*5/6).setScale(0.4);
